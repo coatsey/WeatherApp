@@ -1,3 +1,5 @@
+@file:Suppress("NAME_SHADOWING")
+
 package com.example.weatherapp
 
 import android.Manifest
@@ -24,9 +26,12 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import retrofit2.*
+import kotlinx.android.synthetic.main.activity_main.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -173,6 +178,7 @@ class MainActivity : AppCompatActivity() {
                     if (response!!.isSuccessful) {
                         hideProgressDialog()
                         val weatherList: WeatherResponse = response.body()!!
+                        setupUi(weatherList)
                         Log.i("Response Result", "$weatherList")
                     }else{
                         val rc = response.code()
@@ -210,4 +216,25 @@ class MainActivity : AppCompatActivity() {
             mProgressDialog!!.dismiss()
         }
     }
+
+    @SuppressLint("SetTextI18n", "NewApi")
+    private fun setupUi(weatherList: WeatherResponse){
+        for(i in weatherList.weather.indices){
+            Log.i("Weather Name", weatherList.weather.toString())
+
+            tv_main.text = weatherList.weather[i].main
+            tv_main_description.text = weatherList.weather[i].description
+            tv_temp.text = weatherList.main.temp.toString() + getUnit(application.resources.configuration.locales.toString())
+        }
+    }
+
+    private fun getUnit(value: String): String {
+        Log.i("unitttt", value)
+        var value = "°C"
+        if ("US" == value || "LR" == value || "MM" == value) {
+            value = "°F"
+        }
+        return value
+    }
+
 }
